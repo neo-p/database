@@ -1,8 +1,8 @@
 {
     "name": "neo-p/database",
     "description": "database",
-    "minimum-stability": "dev",
-    "version": "0.0.1",
+    "type": "library",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "6xiaowu9",
@@ -10,6 +10,7 @@
         }
     ],
     "require": {
+        "php": ">=7.0",
         "illuminate/database": "^7.14",
         "neo-p/annotation": "^0.0.1",
         "neo-p/di": "^0.0.1",
@@ -17,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "NeoP\\Database": "src/"
+            "NeoP\\Database\\": "src/"
         }
     }
 }
