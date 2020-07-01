@@ -36,7 +36,7 @@ class DatabasePool extends Pool implements DatabaseInterface, PoolOriginInterfac
                 $maxConnect = $config['pool']['max_connect'] ?? 1;
                 $maxIdle = $config['pool']['max_idle'] ?? 1;
             }
-
+            $instance->createConnection();
             $this->pool($instance, $maxConnect, $maxIdle);
             PoolProvider::setPool($name, $this);
             return $this;
