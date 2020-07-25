@@ -2,6 +2,7 @@
 
 namespace NeoP\Database;
 
+use NeoP\Database\Exception\DatabaseException;
 use Illuminate\Database\Capsule\Manager;
 
 class Database
@@ -40,9 +41,9 @@ class Database
      * @return Client
      * @throws DatabaseException
      */
-    public function createConnection()
+    public function _createConnection()
     {
-        if (! $this->isConnect()) {
+        if (! $this->_isConnect()) {
             try {
                 $instance  = new Manager();
                 $instance->addConnection($this->_database);
@@ -63,9 +64,9 @@ class Database
      * release
      * @return bool
      */
-    protected function release(): bool
+    protected function _release(): bool
     {
-        $this->_root->release($this);
+        $this->_root->_release($this);
         return true;
     }
 
@@ -73,9 +74,9 @@ class Database
      * connect
      * @return bool
      */
-    protected function connect(): bool
+    protected function _connect(): bool
     {
-        $this->_root->connect($this);
+        $this->_root->_connect($this);
         return true;
     }
 
@@ -83,16 +84,16 @@ class Database
      * is connect
      * @return bool
      */
-    public function isConnect(): bool
+    public function _isConnect(): bool
     {
         return $this->_isConnect;
     }
 
     public function __call($name, $arguments)
     {
-        $this->connect();
+        $this->_connect();
         $result = $this->_instance->$name(...$arguments);
-        $this->release();
+        $this->_release();
         return $result;
     }
 }

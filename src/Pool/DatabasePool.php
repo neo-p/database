@@ -24,7 +24,7 @@ class DatabasePool extends Pool implements DatabaseInterface, PoolOriginInterfac
         );
     }
 
-    public function get(array $config, string $name): PoolInterface
+    public function _get(array $config, string $name): PoolInterface
     {
         if (PoolProvider::hasPool($name)) {
             return PoolProvider::getPool($name);
@@ -36,25 +36,25 @@ class DatabasePool extends Pool implements DatabaseInterface, PoolOriginInterfac
                 $maxConnect = $config['pool']['max_connect'] ?? 1;
                 $maxIdle = $config['pool']['max_idle'] ?? 1;
             }
-            $instance->createConnection();
-            $this->pool($instance, $maxConnect, $maxIdle);
+
+            $this->_pool($instance, $maxConnect, $maxIdle);
             PoolProvider::setPool($name, $this);
             return $this;
         }
     }
     
-    public function connect(Database $instance): bool
+    public function _connect(Database $instance): bool
     {
-        if (!$instance->isConnect()) {
-            $instance->createConnection();
+        if (!$instance->_isConnect()) {
+            $instance->_createConnection();
         }
         return true;
     }
 
-    public function release(&$instance): bool
+    public function _release(&$instance): bool
     {
-        if ($instance->isConnect()) {
-            parent::release($instance);
+        if ($instance->_isConnect()) {
+            parent::_release($instance);
         }
         return true;
     }
