@@ -2,9 +2,10 @@
 
 namespace NeoP\Database\Pool;
 
-use NeoP\Pool\Pool;
-use NeoP\Database\Contract\DatabaseInterface;
 use NeoP\Database\Database;
+use NeoP\Database\Contract\DatabaseInterface;
+
+use NeoP\Pool\Pool;
 use NeoP\Pool\Contract\PoolOriginInterface;
 use NeoP\Pool\Contract\PoolInterface;
 use NeoP\Pool\PoolProvider;
@@ -20,7 +21,7 @@ class DatabasePool extends Pool implements DatabaseInterface, PoolOriginInterfac
     {
         return new Database(
             $this,
-            $config['database'],
+            $config['database']
         );
     }
 

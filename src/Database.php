@@ -2,8 +2,10 @@
 
 namespace NeoP\Database;
 
+use NeoP\DI\Container;
 use NeoP\Database\Exception\DatabaseException;
-use Illuminate\Database\Capsule\Manager;
+use Hyperf\Database\Connection;
+use Hyperf\Database\Connectors\ConnectionFactory;
 
 class Database
 {
@@ -11,7 +13,7 @@ class Database
      * 数据库配置
      * @var array
      */
-    protected $_database;
+    protected $_config;
 
     /**
      * root
@@ -25,15 +27,22 @@ class Database
     protected $_instance;
 
     /**
+     * hyperf database connection factory
+     * @var ConnectionFactory
+     */
+    protected $_factory;
+
+    /**
      * is connect
      * @var bool
      */
     protected $_isConnect = false;
 
-    function __construct($root, array $database)
+    function __construct($root, array $config)
     {
-        $this->_database = $database;
+        $this->_config = $config;
         $this->_root = $root;
+        $this->_factory = new ConnectionFactory(new Container());
     }
 
     /**
@@ -45,15 +54,16 @@ class Database
     {
         if (! $this->_isConnect()) {
             try {
-                $instance  = new Manager();
-                $instance->addConnection($this->_database);
-                // $instance->setEventDispatcher(new Dispatcher(new IlluminateContainer));
-                // 设置全局静态可访问DB
-                $instance->setAsGlobal();
-                // 启动Eloquent （如果只使用查询构造器，这个可以注释）
-                $instance->bootEloquent();
                 $this->_isConnect = true;
-                $this->_instance = $instance;
+                $this->_instance = $this->_factory->make($this->_config);
+                if ($this->_instance instanceof Connection) {
+                    // Reset reconnector after db reconnect.
+                    $this->_instance->setReconnector(function ($connection) {
+                        if ($connection instanceof Connection) {
+                            $this->_refresh($connection);
+                        }
+                    });
+                }
             } catch (\Throwable $e) {
                 throw new DatabaseException($e->getMessage(), $e->getCode);
             }
@@ -95,5 +105,18 @@ class Database
         $result = $this->_instance->$name(...$arguments);
         $this->_release();
         return $result;
+    }
+
+    /**
+     * Refresh pdo and readPdo for current connection.
+     */
+    protected function _refresh(Connection $connection)
+    {
+        $refresh = $this->factory->make($this->config);
+        if ($refresh instanceof Connection) {
+            $connection->disconnect();
+            $connection->setPdo($refresh->getPdo());
+            $connection->setReadPdo($refresh->getReadPdo());
+        }
     }
 }

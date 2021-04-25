@@ -13,4 +13,11 @@ class DB
         }
         return PoolProvider::getPool($name);
     }
+
+    public static function __callStatic($name, $arguments)
+    {
+        $result = self::pool()->$name(...$arguments);
+        return $result;
+    }
+
 }
