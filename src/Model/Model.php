@@ -1,6 +1,7 @@
 <?php
 
 namespace NeoP\Database\Model;
+
 use NeoP\Database\DB;
 use ReflectionClass;
 
@@ -9,6 +10,20 @@ class Model
     protected $table;
     protected $pool = 'db.pool';
     protected $prefix = '';
+
+    function __construct()
+    {
+        if (!$this->table) {
+            $reflect = new ReflectionClass($this);
+            $table = strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $reflect->getShortName()));
+            $this->table = $this->prefix . $table;
+        }
+    }
+
+    public function getTable()
+    {
+        return $this->table;
+    }
 
     public static function __callStatic($name, $arguments)
     {
